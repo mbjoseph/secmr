@@ -1,0 +1,37 @@
+% clean citations
+\usepackage{natbib}
+\bibliographystyle{ecology}
+\setcitestyle{authoryear,open={(},close={)}}
+
+% line numbers
+\usepackage[left]{lineno}
+
+\usepackage[margin=1in]{geometry}
+
+% prevent hyphenated wrap
+\usepackage[none]{hyphenat}
+
+% bold math for matrices
+% https://tex.stackexchange.com/questions/199789/which-bold-style-is-recommended-for-matrix-notation
+\newcommand{\matr}[1]{\mathbf{#1}}
+
+% block arrays for matrices with labeled rows and columns
+\usepackage{blkarray}
+
+% monospace font for inline code
+\def\code#1{\texttt{#1}}
+
+% easy equation alignment
+\usepackage{amsmath}
+
+\usepackage{setspace}
+\doublespacing
+
+
+% Author info
+% \usepackage{authblk}
+%
+% \author[1]{Maxwell B. Joseph\thanks{maxwell.b.joseph@colorado.edu}}
+% \affil[1]{Earth Lab, University of Colorado, Boulder, CO 80303, USA}
+% \author[2]{Roland A. Knapp\thanks{roland.knapp@ucsb.edu}}
+% \affil[2]{Sierra Nevada Aquatic Research Laboratory, University of California, Mammoth Lakes, CA 93546, USA}
