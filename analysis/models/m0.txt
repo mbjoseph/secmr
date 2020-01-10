@@ -1,0 +1,14 @@
+model {
+# priors
+omega ~ dbeta(1, 1)
+p ~ dbeta(1, 1)
+
+# cap-recap state model and observations
+for (i in 1:M) {
+  z[i] ~ dbern(omega)
+  y_cmr[i] ~ dbinom(z[i] * p, n_timesteps)
+}
+
+# total abundance
+N <- sum(z[])
+}

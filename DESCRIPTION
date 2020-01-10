@@ -1,13 +1,36 @@
 Package: secmr
-Title: What the Package Does (One Line, Title Case)
+Title: Using encounter data to improve abundance estimates in capture-recapture studies
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "First",
-           family = "Last",
+Authors@R:
+    person(given = "Max",
+           family = "Joseph",
            role = c("aut", "cre"),
-           email = "first.last@example.com")
-Description: What the package does (one paragraph)
+           email = "maxwell.b.joseph@colorado.edu")
+Description: This research compendium contains all of the code for the paper 'Using 
+    encounter data to improve abundance estimates in capture-recapture studies'.
 License: MIT + file LICENSE
 ByteCompile: true
 Encoding: UTF-8
 LazyData: true
+Imports: 
+    assertthat,
+    bookdown,
+    dplyr,
+    forcats,
+    ggplot2,
+    grid,
+    here,
+    jagsUI,
+    magrittr,
+    patchwork, 
+    readr,
+    reshape2,
+    rlang,
+    scales,
+    tibble,
+    tidyr, 
+    tidyselect
+Suggests: devtools,
+    git2r
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.0.2

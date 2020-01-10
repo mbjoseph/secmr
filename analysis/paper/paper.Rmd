@@ -1,0 +1,439 @@
+---
+title: | 
+  | \LARGE{\textbf{Using encounter data to improve capture-recapture abundance estimates}}
+author:
+- \Large{Maxwell B. Joseph\thanks{maxwell.b.joseph@colorado.edu, Earth Lab, University of Colorado, Boulder, CO 80303, USA}}
+- \Large{Roland A. Knapp\thanks{Sierra Nevada Aquatic Research Laboratory, University of California, Mammoth Lakes, CA 93546, USA}}
+output:
+  bookdown::pdf_document2:
+    keep_tex: true
+    toc: false
+    includes:
+      in_header: header.sty
+fontsize: 12pt
+csl: ecology.csl
+bibliography: bibliography.bib
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\begin{abstract}
+Capture-recapture studies are widely used in ecology to estimate population sizes and demographic rates. 
+However, when individuals are hard to capture, encounters may result in failed captures where the identity of an individual is unknown.
+Such encounters are ignored in traditional capture-recapture analyses.
+Here we show that failed captures can provide lower bounds on population size that can increase the precision of abundance estimates. 
+Analytical results and simulations indicate that encounter data improve abundance estimates when capture probabilities are low, and when there are few repeat surveys. 
+We present a hierarchical Bayesian approach for integrating failed captures and auxiliary encounter data in statistical capture-recapture models. 
+This approach can be integrated with existing capture-recapture models, and may prove particularly useful for hard to capture species in data-limited settings.
+\end{abstract}
+
+\linenumbers
+
+```{r, results='hide', message=FALSE, include=FALSE}
+# Run the main analysis
+library(secmr)
+lower_bound_analysis()
+m0_experiments()
+```
+
+# Introduction {-}
+
+Capture-recapture studies are widely used for estimating abundance and demographic rates, using information about the identities of captured individuals [@jolly1965explicit]. 
+However, capture-recapture studies can involve encounters with animals that result in failed capture attempts. 
+If individual identification requires capture, identities of animals that are encountered but not captured are unknown. 
+This is the case for example in capture-recapture studies of amphibians that use passive integrated transponders for individual identification of animals caught in dip nets [@joseph2018disease]. 
+Encounters leading to failed captures can provide valuable information about abundance, but this information is not readily used in traditional capture-recapture models. 
+
+Encounter and capture data both provide lower bounds on the total number of individuals in the population. 
+If each individual is encountered once at most on a survey, total abundance must be greater than or equal to the number of animals encountered in a survey.
+Similarly, total abundance must be greater than or equal to the number of unique individuals captured. 
+Capture data differ however, in that information accumulates over multiple surveys [@pollock1982capture].
+For example, if two surveys occur on consecutive days in a closed population, then the total number of unique individuals captured across both surveys provides a lower bound on abundance. 
+
+Here, we show how encounter data can improve abundance estimates in capture-recapture studies. 
+We develop a modified likelihood for capture-recapture studies using parameter expanded data augmentation [@royle2012parameter], and study conditions under which encounter data improve abundance estimates.
+The methods presented here accommodate both failed captures and counts of animals collected separately from capture-recapture surveys, and can be integrated with existing capture-recapture models. 
+
+# Methods {-}
+
+## Model description {-}
+
+Abundance can be estimated from capture-recapture data in a Bayesian framework using parameter-expanded data augmentation [@royle2012parameter]. 
+Here, capture histories of $N^*$ unique individuals are observed, but capture histories of $M > N^*$ individuals are modeled, augmenting the observed data with $M-N^*$ additional capture histories of animals that were never captured. 
+The assumption is that the true abundance $N$ is less than $M$, but greater than the number of observed individuals $N^*$.
+
+Individuals $i=1,...,M$ are either "in the population" ($z_i = 1$) or not ($z_i=0$), where the parameters $z_1, ..., z_M$ are state parameters to be estimated, and abundance is $N = \sum_i z_i$.
+These states can be modeled as conditionally independent Bernoulli random variables with probability parameter $\omega$, where $\omega$ is the probability of an individual being in the population:
+
+$$z_i \sim \text{Bernoulli}(\omega).$$
+
+On surveys $k=1,...,K$ an observer searches for individuals, encountering each individual with probability $\eta$.
+If an animal is encountered, it is captured with probability $\kappa$.
+If individuals must be captured to be identified, then encounter data are observed for captured individuals, but not for failed captures. 
+Thus, encounter histories are partly observed. 
+We assume the number of failed captures on each survey is observed. 
+
+Let $y^*_{i, k}$ represent the categorical outcome for individual $i$ on survey $k$.
+There are three possibilities:
+
+1. The individual was not encountered ($y^*_{i, k} = 1$), with probability $z_i (1 - \eta) + 1 - z_i$.
+2. The individual was encountered but not captured ($y^*_{i, k} = 2$), with probability $z_i \eta (1 - \kappa)$.
+3. The individual was captured ($y^*_{i, k} = 3$), with probability $z_i \eta \kappa$.
+
+The first two outcomes are not observed. 
+What is observed is typically a binary record of whether individual $i$ was captured on survey $k$: $y_{i, k}$, so that $y_{i, k} = I(y^*_{i, k} = 3)$, where $I$ is an indicator function that is equal to one if the condition inside the parentheses is satisfied, otherwise it equals zero.
+In other words, we only observe $y^*_{i, k}$ when $y^*_{i, k} = 3$.
+Additionally, the observed number of failed captures $f_k$ corresponds to the sum $f_k = \sum_i I(y^*_{i, k} = 2)$.
+The observation model consists of two parts: one for the capture data: 
+
+$$[y_{i, k} \mid y^*_{i, k} ] = \text{Bernoulli}(I(y^*_{i, k} = 3)),$$
+
+and another for the failed capture counts: 
+
+$$[f_k \mid y^*_{1, k}, ..., y^*_{M, k}] = I(f_k = \sum_i I(y^*_{i, k} = 2)),$$
+
+where square brackets denote a probability function. 
+Alternatively, a "soft" constraint can be imposed as an approximation or to account for uncertainty in the number of failed captures:
+
+$$[f_k \mid y^*_{1, k}, ..., y^*_{M, k}] = \text{Normal}(f_k \mid \sum_i I(y^*_{i, k} = 2), \sigma),$$
+
+with $\sigma$ set to some small fixed value.
+
+The parameters consist of states $z_1, ..., z_M$, outcomes $y^*_{1, 1}, ..., y^*_{M, K}$, and the probabilities of inclusion ($\omega$), encounter ($\eta$), and capture ($\kappa$).
+The data consist of the capture histories $y_{1,1}, ..., y_{M, K}$, and counts of failed captures from each survey $f_1, ..., f_K$. 
+The posterior distribution of parameters given data, $[z_1, ..., z_M, y^*_{1, 1}, ..., y^*_{M, K}, \omega, \eta, \kappa \mid y_{1,1}, ..., y_{M, K}, f_1, ..., f_K]$, is proportional to:
+
+$$
+\begin{aligned}
+  \overbrace{\prod_i \prod_k [y_{i, k} \mid y^*_{i, k}]}^{\text{Captures}} \times \overbrace{\prod_k [f_k \mid y^*_{1, k}, ..., y^*_{M, k}]}^{\text{Failed captures}} \times \\
+  \overbrace{\prod_i \prod_k [y^*_{i, k} \mid z_i, \eta, \kappa]}^{\text{Encounter model}} \times \overbrace{\prod_i [z_i \mid \omega]}^{\text{State model}} \times \overbrace{[\omega, \eta, \kappa]}^{\text{Priors}}.
+\end{aligned}
+$$
+
+
+This model can be implemented in the popular BUGS language [@lunn2009bugs], and we provide example specifications in Appendix S1.
+
+### Auxiliary encounter data {-}
+
+In some cases, auxiliary encounter data are collected, such as during visual encounter surveys where individuals are counted on surveys, but no captures are attempted [@crump1994visual].
+Let $a_k$ represent the number of unique individuals that were encountered on survey $k$.
+If encounters of individuals are conditionally independent, a binomial observation model provides a reasonable choice, where the number of trials is the population abundance $N = \sum_i z_i$ and the probability of success is the encounter probability $\eta$:
+
+$$[a_k \mid \eta, z_1, ..., z_M] = \text{Binomial}(\eta, \sum_i z_i),$$
+
+for surveys $k=1, ..., K$.
+This is the observation model used in N-mixture models [@royle2004n]. 
+In addition to potentially providing a higher lower bound on abundance, auxiliary encounters also provide additional information about encounter probabilities, because the encounter data are conditionally independent from encounters leading to captures. 
+When combined with the capture-recapture model outlined above, the joint model of captures, failed captures, and auxiliary encounters comprise an integrated population model [@besbeas2002integrating; @abadi2010assessment]. 
+The posterior distribution is proportional to: 
+
+$$
+\begin{aligned}
+  \overbrace{\prod_i \prod_k [y_{i, k} \mid y^*_{i, k}]}^{\text{Captures}} \times \overbrace{\prod_k [f_k \mid y^*_{1, k}, ..., y^*_{M, k}]}^{\text{Failed captures}} \times \overbrace{\prod_k [a_k \mid \sum_i z_i, \eta]}^{\text{Auxiliary encounters}} \times \\
+  \overbrace{\prod_i \prod_k [y^*_{i, k} \mid z_i, \eta, \kappa]}^{\text{Encounter model}} \times \overbrace{\prod_i [z_i \mid \omega]}^{\text{State model}} \times \overbrace{[\omega, \eta, \kappa]}^{\text{Priors}}.
+\end{aligned}
+$$
+
+## Abundance lower bounds from encounter and capture data {-}
+
+The total population size is bounded from below by the number animals encountered on any one survey, assuming each animal can be encountered once at most (i.e., individuals are not double-counted). 
+If $n_k$ is the number of unique animals encountered on survey $k$, the lower bound on abundance from encounter data $n_\text{min} = \text{max}(n_1, ..., n_K)$ is the maximum of $K$ independent binomial random variables with sample size $N$ and probability $\eta$.
+The probability mass function of this lower bound is thus given by:
+
+$$\text{Pr}(n_{\text{min}} = n) = F(n)^K - F(n-1)^K,$$
+where $F(n)$ is the cumulative distribution function of a binomial random variable. 
+
+Population size must also be greater than or equal to the number of unique captured individuals.
+A probability mass function for the lower bound on abundance from capture data ($c_\text{min}$: the number of unique captured individuals) can be derived with a binomial distribution. 
+The binomial sample size is the true population size ($N$), and the probability of success is the probability of being captured one or more times: $1 - (1 - \eta \kappa)^K$.
+The probability mass function for $c_\text{min}$, the abundance lower bound derived from the capture data, is:
+
+$$\text{Pr}(c_\text{min} = n) = \text{Binomial}(n \mid 1 - (1 - \eta \kappa)^K, N).$$
+
+When the expected lower bound from encounter data exceeds the expected lower bound from capture data ($\mathbb{E}(n_{\text{min}}) > \mathbb{E}(c_{\text{min}})$), encounter data are expected to increase the precision of abundance estimates. 
+
+## Simulations {-}
+
+We empirically verified our theoretical results about the expected lower bounds on abundance provided by encounter and capture data using Monte Carlo simulation. 
+We generated five replicate encounter-capture-recapture data sets for each parameter combination of $N=10, 50, 100$, $K=3, 6, 9$, and $\eta$ and $\kappa$ ranging from 0.01 to 0.99 in increments of 0.01, resulting in `r format(5 * 3 * 3 * length(seq(0.01, .99, by = .01))^2, big.mark = ",", nsmall = 0)` unique data sets. 
+For each parameter combination, we computed the empirical mean lower bounds from encounter and capture data, averaging over the five replicate iterations, and compared the results to the theoretical expectations generated from the probability mass functions for $n_{\text{min}}$ and $c_\text{min}$.
+
+To understand the implications of bounding abundance for other parameters, we used a simulation study with known parameters across a range of repeat surveys ($K=3$, $K=6$, and $K=9$).
+We visualized the joint posterior distribution of abundance and the probability of being encountered and captured, and compared these results to a simpler model: $M_0$ - a capture-recapture model of a closed population with identical detection probabilities $p_1 = ... = p_K = p$, which ignores encounters that do not lead to captures [@royle2008hierarchical].
+This model can only estimate the marginal probability of capture $p = \eta \kappa$.
+The observation model is $y_{i, k} \sim \text{Bernoulli}(z_i p)$ for individuals $i=1, ..., M$ on survey $k=1, ..., K$. 
+The state model for $z$ is unchanged, and uniform priors over (0, 1) were assigned to $\omega$ and $p$. 
+
+Draws from the posterior distributions of all models were simulated using JAGS, with six parallel Markov chain Monte Carlo chains, and 300,000 iterations per chain with an adaptation period of 30,000, a burn-in period of 100,000, and posterior thinning by 300 to reduce memory usage [@plummer2003jags]. 
+Convergence was assessed using visual inspection of traceplots, and the potential scale reduction factor ($\hat{R}$) statistic [@gelman1992inference].
+All code to replicate the analyses is available in a research compendium at [https://github.com/mbjoseph/secmr](https://github.com/mbjoseph/secmr).
+
+# Results {-}
+
+Across a range of abundances, encounter data are expected to provide a higher lower bound on abundance when capture probabilities are low, and when there are few repeat surveys (Figure 1).
+The boundary in the bivariate encounter-capture parameter space delineating the region where $\mathbb{E}(c_\text{min} - n_{\text{min}}) < 0$ shifts toward lower capture probabilities as the number of repeat surveys increases, and as abundance increases. 
+Empirical average bounds from simulated capture-recapture data were in agreement with the theoretical expectations derived from the probability mass functions of $n_{\text{min}}$ and $c_\text{min}$ (Figure 2).
+
+When the lower bound on abundance is greater for encounter data than capture data, the joint model of encounters and captures produces a more precise estimate of abundance because there is zero probability mass below the lower bound on abundance.
+Furthermore, if there is posterior correlation between abundance and another parameter, encounter data can also increase the precision of the correlated parameter.
+For example, the marginal probability of capture and abundance are correlated in the posterior, so that increased posterior precision for abundance implies increased posterior precision of marginal capture probability (Figure 3).
+
+# Discussion {-}
+
+Failed captures and auxiliary encounters are likely to be most useful in capture-recapture studies when animals are hard to capture and the number of surveys is small. 
+This expectation holds across a range of population abundance and encounter probabilities. 
+In such cases, encounter data increase the precision of population abundance estimates by increasing the lower bound on abundance. 
+Such data are essentially "free" in encounter-capture-recapture study designs, and can be included by modifying the likelihood function (and not the underlying state model) of capture-recapture models. 
+
+In addition to increasing the precision of abundance estimates, encounter data can increase the precision of parameter estimates for parameters that are correlated with abundance in the posterior distribution. 
+For the simple model presented here, this includes the detection and inclusion probabilities. 
+For more complex models that allow state evolution through time, this might include survival and recruitment probabilities. 
+Thus, we expect that encounter data in general might provide information about abundance, and parameters relating to abundance and the measurement process.
+
+These results are consistent with related findings for mark-resight studies where marked individuals are subject to incomplete identification. 
+In such studies, accounting for failed identifications of marked individuals -- analogous to failed captures -- is most advantageous when identification probabilities are low -- analogous to capture probabilities being low [@mcclintock2014mark]. 
+However, in the encounter-capture-recapture scenario considered here, we assume that whether an animal is marked or not is unknown until it is captured (as would be the case for subdermal PIT tags in an amphibian).
+
+Looking ahead, there are opportunities to build upon this approach. 
+First, in terms of implementation, marginalization over the discrete latent variables -- if possible -- could allow more efficient sampling from the posterior distribution. 
+Second, because this model includes separate parameters for encounter and capture probabilities, covariates can be included separately for each of these components. 
+This could be useful for example to account for predator avoidance behavior that might influence capture probabilities, and weather conditions that might influence encounter probabilities.
+Observer effects provide an additional use case: some observers might be better than others at finding or capturing individual animals.
+
+In this paper, we presented a motivation for including encounter data in capture-recapture studies based on abundance lower bounds from encounter and capture data. 
+This relates to other approaches for handling imperfect individual identification in capture-recapture studies including misidentification [@link2010uncovering; @mcclintock2014probit; @schofield2015connecting] and partial identification [@augustine2018spatial].
+Given that encounter data are included via a modified likelihood and not a modified state model, this approach can be readily integrated with a variety of capture-recapture models, and may be useful for hard to capture species in data-limited settings.
+
+# Acknowledgements {-}
+
+This work was motivated by years experience in the field capturing (and failing to capture) amphibians in the Sierra Nevada and the Klamath mountains, and funded by a grant from the Yosemite Conservancy. 
+
+# References {-}
+
+<div id="refs"></div>
+
+\clearpage 
+
+# Figure legends {-}
+
+## Figure 1 {-}
+
+Expectations for the difference in abundance lower bounds provided by capture and encounter data as a function of the number of surveys $K$, abundance $N$, the encounter probability $\eta$, and the probability of capture conditional on an encounter $\kappa$. When the surface is red, encounter data are expected to increase the precision of abundance estimates by increasing the lower bound on true abundance. The heavy black line marks the null isocline where the expected difference is zero. Lighter lines represent contours spaced by 2 individuals.
+
+## Figure 2 {-}
+
+Empirical verification of theoretical expectations for lower bounds on abundance provided by encounter and capture data.
+Each point represents the empirical average of five replicate simulations across a range of parameter values, with panels separated by population size ($N$) and whether the lower bounds are derived from capture data ($c_\text{min}$) or encounter data ($n_\text{min}$).
+
+## Figure 3 {-}
+
+Samples from the posterior distribution of abundance (N, x-axis) and marginal capture probability $p=\eta \kappa$ for an individual in the population (y-axis). Each point is a sample from the posterior. Black points correspond to the baseline capture-recapture model $M_0$, which does not include encounter data. Blue points correspond to an encounter-capture-recapture model that uses encounter data to bound abundance. Vertical dashed lines are shown for the lower bounds on abundance derived from encounter ($n_{\text{min}}$) and capture ($c_{\text{min}}$) data.
+
+\clearpage
+
+# Figures {-}
+
+## Figure 1 {-}
+
+```{r m0-maxima, fig.cap = "", echo=FALSE,  out.width = "450px", message = FALSE, warning=FALSE}
+library(here)
+knitr::include_graphics(here::here("analysis", "figures", "m0-maxima.png"))
+```
+
+\clearpage
+
+## Figure 2 {-}
+
+```{r sim-verification, fig.cap = "", echo=FALSE,  out.width = "450px"}
+knitr::include_graphics(here::here("analysis", "figures", "sim-verification.png"))
+```
+
+\clearpage
+
+## Figure 3 {-}
+
+```{r joint-post, fig.cap = "", echo=FALSE,  out.width = "450px"}
+knitr::include_graphics(here::here("analysis", "figures", "joint-post.pdf"))
+```
+
+\clearpage
+
+# (APPENDIX) Supporting information {-} 
+
+# Appendix S1 {-}
+
+This appendix includes model specifications and BUGS/JAGS code for failed capture and auxiliary encounter models. 
+These models differ in the observation process, but the model of presence/absence states is identical. 
+Each individual $i=1, ..., M$ is either in the population ($z_i=1$) or not ($z_i=0$), where $z_i \sim \text{Bernoulli}(\omega)$, and $\omega$ is an inclusion probability parameter. 
+Abundance is the sum of these values $N=\sum_i z_i$.
+
+## Baseline model {-}
+
+The baseline model is $M_0$ and assumes equal detection probabilities of individuals $i=1, ..., M$ on surveys $k=1,..., K$, where $y_{i, k}=1$ represents a capture of individual $i$ on survey $k$, and $y_{i, k}=0$ indicates no capture. 
+If $p$ is the capture probability, then $y_{i, k} \sim \text{Bernoulli}(z_i p)$.
+The posterior distribution is: 
+
+$$
+\begin{aligned}
+  \big[ z_1, ..., z_M, \omega, p \mid y_{1, 1}, ..., y_{M, K} \big] \propto \\
+  \overbrace{\prod_i \prod_k [y_{i, k} \mid z_{i}, p]}^{\text{Captures}} \times 
+  \times \overbrace{\prod_i [z_i \mid \omega]}^{\text{State model}} \times \overbrace{[\omega, p]}^{\text{Priors}}.
+\end{aligned}
+$$
+
+JAGS code for this model with uniform priors over $\omega$ and $p$ is:
+
+```r
+model {
+omega ~ dbeta(1, 1)
+p ~ dbeta(1, 1)
+
+for (i in 1:M) {
+  z[i] ~ dbern(omega)
+  for (k in 1:K) {
+    y[i, k] ~ dbern(z[i] * p)
+  }
+}
+}
+```
+
+## Baseline model with failed captures {-}
+
+We add failed captures to the baseline model by introducing a categorical parameter $y^*_{i, k}$, which represents "not encountered" ($y^*_{i, k} = 1$), "failed capture" ($y^*_{i, k} = 2$), or "capture" ($y^*_{i, k}=3$). 
+If $\eta$ is the encounter probability, $\kappa$ is the probability of capture conditional on encounter, and $f_k$ is the number of failed captures, then as described in the main text the posterior is:
+
+$$
+\begin{aligned}
+  \big[ z_1, ..., z_M, y^*_{1, 1}, ..., y^*_{M, K}, \omega, \eta, \kappa \mid y_{1, 1}, ..., y_{M, K}, f_1, ..., f_K \big] \propto \\
+  \overbrace{\prod_i \prod_k [y_{i, k} \mid y^*_{i, k}]}^{\text{Captures}} \times \overbrace{\prod_k [f_k \mid y^*_{1, k}, ..., y^*_{M, k}]}^{\text{Failed captures}} \times \\
+  \overbrace{\prod_i \prod_k [y^*_{i, k} \mid z_i, \eta, \kappa]}^{\text{Encounter model}} \times \overbrace{\prod_i [z_i \mid \omega]}^{\text{State model}} \times \overbrace{[\omega, \eta, \kappa]}^{\text{Priors}}.
+\end{aligned}
+$$
+
+JAGS code for this model with uniform priors over $\omega$, $\eta$, and $\kappa$ is:
+
+```r
+model {
+  omega ~ dbeta(1, 1)
+  p_encounter ~ dbeta(1, 1)
+  p_capture ~ dbeta(1, 1)
+  p_encounter_and_capture = p_encounter * p_capture
+  p_failed_capture = p_encounter * (1 - p_capture)
+  p_not_encountered = 1 - p_encounter
+  
+  for (i in 1:M) {
+    z[i] ~ dbern(omega)
+    pi[i, 1] = z[i] * p_not_encountered + 1 - z[i]
+    pi[i, 2] = z[i] * p_failed_capture
+    pi[i, 3] = z[i] * p_encounter_and_capture
+    for (k in 1:K) {
+      y_star[i, k] ~ dcat(pi[i, ])
+      y[i, k] ~ dbern(y_star[i, k] == 3)
+    }
+  }
+  
+  # number of failed captures (soft constraint)
+  for (k in 1:K) {
+    failures[k] ~ dnorm(sum(y_star[, k] == 2), 4)
+  }
+}
+```
+
+Note that the normal distribution for failed captures imposes a "soft" constraint on the sum $\sum_i y^*_{i, k}$. 
+By adjusting the normal precision parameter, this constraint can be relaxed or made more strict. 
+In the strictest case a hard constraint can be imposed via the "ones trick", where a vector of ones is passed as data, and the likelihood for failed captures is represented as `ones[k] ~ dbern(sum(y_star[, k]) == failures[k])`.
+
+
+## Baseline model with auxiliary encounters {-}
+
+To add auxiliary encounter data to the baseline model, we use the following likelihood for the number of auxiliary encounters $a_k$ in survey $k$ conditional on the true abundance $N$ and the encounter probability $\eta$: 
+
+$$a_k \sim \text{Binomial}(\eta, N),$$
+
+where $N = \sum_i z_i$.
+Note that there need not be an equal number ($K$) capture-recapture surveys and auxiliary encounter surveys, but here we assume this is the case to simplify notation. 
+This model permits decomposing the parameter $p$, which represents the marginal probability of capture, into the product of the encounter probability $\eta$ and the probability of capture conditional on encounter $\kappa$. 
+
+Then, the posterior is:
+
+$$
+\begin{aligned}
+  \big[ z_1, ..., z_M, \omega, \eta, \kappa \mid y_{1, 1}, ..., y_{M, K}, a_1, ..., a_K \big] \propto \\
+  \overbrace{\prod_i \prod_k [y_{i, k} \mid z_{i}, \eta, \kappa]}^{\text{Captures}} \times \overbrace{\prod_k [a_k \mid \sum_i z_i, \eta]}^{\text{Auxiliary encounters}} \times 
+  \times \overbrace{\prod_i [z_i \mid \omega]}^{\text{State model}} \times \overbrace{[\omega, \eta, \kappa]}^{\text{Priors}}.
+\end{aligned}
+$$
+
+JAGS code for this model with uniform priors over $\omega$, $\eta$, and $\kappa$ is:
+
+```r
+model {
+omega ~ dbeta(1, 1)
+p_encounter ~ dbeta(1, 1)
+p_capture ~ dbeta(1, 1)
+
+for (i in 1:M) {
+  z[i] ~ dbern(omega)
+  for (k in 1:K) {
+    y[i, k] ~ dbern(z[i] * p_encounter * p_capture)
+  }
+}
+
+N <- sum(z[])
+for (k in 1:K) {
+  a[k] ~ dbinom(p_encounter, N)
+}
+}
+```
+
+## Baseline model with failed captures and auxiliary encounters {-}
+
+Combining failed captures and auxiliary encounters includes the N-mixture model likelihood for auxiliary encounters in the failed capture model. 
+As described in the main text, the posterior is: 
+
+
+$$
+\begin{aligned}
+  \big[ z_1, ..., z_M, y^*_{1, 1}, ..., y^*_{M, K}, \omega, \eta, \kappa \mid y_{1, 1}, ..., y_{M, K}, f_1, ..., f_K, a_1, ..., a_K \big] \propto \\
+  \overbrace{\prod_i \prod_k [y_{i, k} \mid y^*_{i, k}]}^{\text{Captures}} \times \overbrace{\prod_k [f_k \mid y^*_{1, k}, ..., y^*_{M, k}]}^{\text{Failed captures}} \times \overbrace{\prod_k [a_k \mid \sum_i z_i, \eta]}^{\text{Auxiliary encounters}} \times \\
+  \overbrace{\prod_i \prod_k [y^*_{i, k} \mid z_i, \eta, \kappa]}^{\text{Encounter model}} \times \overbrace{\prod_i [z_i \mid \omega]}^{\text{State model}} \times \overbrace{[\omega, \eta, \kappa]}^{\text{Priors}}.
+\end{aligned}
+$$
+
+JAGS code for this model with uniform priors over $\omega$, $\eta$, and $\kappa$ is:
+
+```r
+model {
+  omega ~ dbeta(1, 1)
+  p_encounter ~ dbeta(1, 1)
+  p_capture ~ dbeta(1, 1)
+  p_encounter_and_capture = p_encounter * p_capture
+  p_failed_capture = p_encounter * (1 - p_capture)
+  p_not_encountered = 1 - p_encounter
+  
+  for (i in 1:M) {
+    z[i] ~ dbern(omega)
+    pi[i, 1] = z[i] * p_not_encountered + 1 - z[i]
+    pi[i, 2] = z[i] * p_failed_capture
+    pi[i, 3] = z[i] * p_encounter_and_capture
+    for (k in 1:K) {
+      y_star[i, k] ~ dcat(pi[i, ])
+      y[i, k] ~ dbern(y_star[i, k] == 3)
+    }
+  }
+  
+  # number of failed captures (soft constraint)
+  for (k in 1:K) {
+    failures[k] ~ dnorm(sum(y_star[, k] == 2), 4)
+  }
+  
+  N <- sum(z[])
+  for (k in 1:K) {
+    a[k] ~ dbinom(p_encounter, N)
+  }
+}
+```

@@ -1,0 +1,29 @@
+model {
+  # priors
+  omega ~ dbeta(1, 1)
+  p_encounter ~ dbeta(1, 1)
+  p_capture ~ dbeta(1, 1)
+  p_enc_cap = p_encounter * p_capture
+  p_missed = p_encounter * (1 - p_capture)
+  p_not_enc = 1 - p_encounter
+  
+  for (i in 1:M) {
+    z[i] ~ dbern(omega)
+    pi[i, 1] = z[i] * p_not_enc + 1 - z[i]
+    pi[i, 2] = z[i] * p_missed
+    pi[i, 3] = z[i] * p_enc_cap
+    for (k in 1:n_timesteps) {
+      y_star[i, k] ~ dcat(pi[i, ])
+      y[i, k] ~ dbern(y_star[i, k] == 3)
+    }
+  }
+  
+  # total abundance
+  N <- sum(z[])
+  
+  # failed capture data
+  for (k in 1:n_timesteps) {
+    n_missed[k] = sum(y_star[, k] == 2)
+    failures[k] ~ dnorm(n_missed[k], 4)
+  }
+}
