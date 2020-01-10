@@ -16,7 +16,7 @@ Title <- "Title of your paper goes here"
 
 # secmr
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh///master?urlpath=rstudio)
+[![Travis build status](https://travis-ci.org/mbjoseph/secmr.svg?branch=master)](https://travis-ci.org/mbjoseph/secmr)
 
 This repository contains the data and code for our paper:
 
@@ -41,8 +41,8 @@ Or you can install this compendium as an R package, secmr, from GitHub with:
 
 
 ```{r gh-installation, eval = FALSE}
-# install.packages("devtools")
-remotes::install_github("/")
+# install.packages("remotes")
+remotes::install_github("mbjoseph/secmr")
 ```
 
 
@@ -51,8 +51,6 @@ remotes::install_github("/")
 **Text and figures :**  [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
 
 **Code :** See the [DESCRIPTION](DESCRIPTION) file
-
-**Data :** [CC-0](http://creativecommons.org/publicdomain/zero/1.0/) attribution requested in reuse
 
 ### Contributions
 
