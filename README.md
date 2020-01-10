@@ -3,7 +3,8 @@
 
 # secmr
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh///master?urlpath=rstudio)
+[![Travis build
+status](https://travis-ci.org/mbjoseph/secmr.svg?branch=master)](https://travis-ci.org/mbjoseph/secmr)
 
 This repository contains the data and code for our paper:
 
@@ -13,7 +14,7 @@ This repository contains the data and code for our paper:
 Our pre-print is online here:
 
 > Authors, (YYYY). *Title of your paper goes here*. Name of
-> journal/book, Accessed 07 Jan 2020. Online at
+> journal/book, Accessed 09 Jan 2020. Online at
 > <https://doi.org/xxx/xxx>
 
 ### How to cite
@@ -21,7 +22,7 @@ Our pre-print is online here:
 Please cite this compendium as:
 
 > Authors, (2020). *Compendium of R code and data for Title of your
-> paper goes here*. Accessed 07 Jan 2020. Online at
+> paper goes here*. Accessed 09 Jan 2020. Online at
 > <https://doi.org/xxx/xxx>
 
 ### How to download or install
@@ -33,8 +34,8 @@ Or you can install this compendium as an R package, secmr, from GitHub
 with:
 
 ``` r
-# install.packages("devtools")
-remotes::install_github("/")
+# install.packages("remotes")
+remotes::install_github("mbjoseph/secmr")
 ```
 
 ### Licenses
@@ -43,9 +44,6 @@ remotes::install_github("/")
 [CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)
 
 **Code :** See the [DESCRIPTION](DESCRIPTION) file
-
-**Data :** [CC-0](http://creativecommons.org/publicdomain/zero/1.0/)
-attribution requested in reuse
 
 ### Contributions
 
