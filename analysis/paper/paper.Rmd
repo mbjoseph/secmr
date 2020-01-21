@@ -25,7 +25,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Capture-recapture studies are widely used in ecology to estimate population sizes and demographic rates. 
 However, when individuals are hard to capture, encounters may result in failed captures where the identity of an individual is unknown.
 Such encounters are ignored in traditional capture-recapture analyses.
-Here we show that failed captures can provide lower bounds on population size that can increase the precision of abundance estimates. 
+Here we show that failed captures provide lower bounds on population size that can increase the precision of abundance estimates. 
 Analytical results and simulations indicate that encounter data improve abundance estimates when capture probabilities are low, and when there are few repeat surveys. 
 We present a hierarchical Bayesian approach for integrating failed captures and auxiliary encounter data in statistical capture-recapture models. 
 This approach can be integrated with existing capture-recapture models, and may prove particularly useful for hard to capture species in data-limited settings.
