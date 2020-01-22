@@ -3,27 +3,28 @@
 
 # secmr
 
+## A research compendium for: “Using encounter data to improve capture-recapture abundance estimates”
+
 [![Travis build
 status](https://travis-ci.org/mbjoseph/secmr.svg?branch=master)](https://travis-ci.org/mbjoseph/secmr)
 
-This repository contains the data and code for our paper:
+<!-- This repository contains the data and code for our paper: -->
 
-> Authors, (YYYY). *Title of your paper goes here*. Name of journal/book
-> <https://doi.org/xxx/xxx>
+<!-- > Authors, (YYYY). _Using encounter data to improve capture-recapture abundance estimates_. Name of journal/book <https://doi.org/xxx/xxx> -->
 
 Our pre-print is online here:
 
-> Authors, (YYYY). *Title of your paper goes here*. Name of
-> journal/book, Accessed 09 Jan 2020. Online at
+> Joseph MB, Knapp RA, (2020). *Using encounter data to improve
+> capture-recapture abundance estimates*. bioRxiv, Online at
 > <https://doi.org/xxx/xxx>
 
 ### How to cite
 
 Please cite this compendium as:
 
-> Authors, (2020). *Compendium of R code and data for Title of your
-> paper goes here*. Accessed 09 Jan 2020. Online at
-> <https://doi.org/xxx/xxx>
+> Joseph MB, Knapp RA, (2020). *Compendium of R code and data for Using
+> encounter data to improve capture-recapture abundance estimates*.
+> Accessed 22 Jan 2020. Online at <https://doi.org/xxx/xxx>
 
 ### How to download or install
 

@@ -11,27 +11,29 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 # Please put your title here to include it in the file below.
-Title <- "Title of your paper goes here"
+Title <- "Using encounter data to improve capture-recapture abundance estimates"
 ```
 
 # secmr
 
+## A research compendium for: "Using encounter data to improve capture-recapture abundance estimates"
+
 [![Travis build status](https://travis-ci.org/mbjoseph/secmr.svg?branch=master)](https://travis-ci.org/mbjoseph/secmr)
 
-This repository contains the data and code for our paper:
+<!-- This repository contains the data and code for our paper: -->
 
-> Authors, (YYYY). _`r Title`_. Name of journal/book <https://doi.org/xxx/xxx>
+<!-- > Authors, (YYYY). _`r Title`_. Name of journal/book <https://doi.org/xxx/xxx> -->
 
 Our pre-print is online here:
 
-> Authors, (YYYY). _`r Title`_. Name of journal/book, Accessed `r format(Sys.Date(), "%d %b %Y")`. Online at <https://doi.org/xxx/xxx>
+> Joseph MB, Knapp RA, (2020). _`r Title`_. bioRxiv, Online at <https://doi.org/xxx/xxx>
 
 
 ### How to cite
 
 Please cite this compendium as:
 
-> Authors, (`r format(Sys.Date(), "%Y")`). _Compendium of R code and data for `r Title`_. Accessed `r format(Sys.Date(), "%d %b %Y")`. Online at <https://doi.org/xxx/xxx>
+> Joseph MB, Knapp RA, (`r format(Sys.Date(), "%Y")`). _Compendium of R code and data for `r Title`_. Accessed `r format(Sys.Date(), "%d %b %Y")`. Online at <https://doi.org/xxx/xxx>
 
 ### How to download or install
 
