@@ -214,6 +214,10 @@ For the simple model presented here, this includes the detection and inclusion p
 For more complex models that allow state evolution through time, this might include survival and recruitment probabilities. 
 Thus, we expect that encounter data in general might provide information about abundance, and parameters relating to abundance and the measurement process.
 
+These results are consistent with related findings for mark-resight studies where marked individuals are subject to incomplete identification. 
+In such studies, accounting for failed identifications of marked individuals -- analogous to failed captures -- is most advantageous when identification probabilities are low -- analogous to capture probabilities being low [@mcclintock2014mark]. 
+However, in the encounter-capture-recapture scenario considered here, whether an animal is marked or not is unknown until it is captured, as would be the case for subdermal passive integrated transponder tags in an amphibian [@gibbons2004pit]. 
+
 Here we assumed that individuals could be encountered at most once per sampling occasion. 
 In other words, there is no double counting: each failed capture corresponds to one unique individual. 
 The observation model developed here is not robust to violations of this assumption, because the total number of encounters sets a lower bound on the true population size. 
@@ -223,16 +227,12 @@ This assumption is likely to hold for example in capture-recapture studies of am
 If individuals are captured multiple times in the same sampling occasion, then it will be clear that the assumption of at most one encounter has been violated. 
 In such cases, alternative encounter models may be necessary, e.g., a Poisson model that allows repeat encounters on a sampling occasion [@royle2009bayesian].
 
-These results are consistent with related findings for mark-resight studies where marked individuals are subject to incomplete identification. 
-In such studies, accounting for failed identifications of marked individuals -- analogous to failed captures -- is most advantageous when identification probabilities are low -- analogous to capture probabilities being low [@mcclintock2014mark]. 
-However, in the encounter-capture-recapture scenario considered here, we assume that whether an animal is marked or not is unknown until it is captured, as would be the case for subdermal passive integrated transponder tags in an amphibian [@gibbons2004pit]. 
-
 The model developed here relates to other approaches for handling imperfect individual identification in capture-recapture studies including misidentification [@link2010uncovering; @mcclintock2014probit; @schofield2015connecting] and partial identification [@augustine2018spatial], and also to approaches that account for latent encounter histories with observed summary counts [@chandler2013spatially].
 In particular, this approach might be viewed as an aspatial analog of the spatial model presented in @chandler2013spatially in which a subset of individual identities are available, with a Bernoulli (instead of a Poisson) encounter model, and a stochastic second stage "identification upon encounter" component. 
 This approach can also be seen as a degenerate case of a partial identification model, in which there are no spatial [@augustine2018spatial] or genetic data [@wright2009incorporating] available to inform the identities of individuals that have escaped capture.
 
 Looking ahead, there are opportunities to build upon this approach. 
-First, in terms of implementation, marginalization over the discrete latent variables -- if possible -- could allow more efficient sampling from the posterior distribution. 
+First, in terms of implementation, marginalization over the discrete latent variables might allow more efficient sampling from the posterior distribution. 
 Second, because this model includes separate parameters for encounter and capture probabilities, covariates can be included separately for each of these components. 
 This could be useful for example to account for predator avoidance behavior that might influence capture probabilities, and weather conditions that might influence encounter probabilities.
 Observer effects provide an additional use case: some observers might be better than others at finding or capturing individual animals.
