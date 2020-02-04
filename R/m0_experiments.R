@@ -54,7 +54,7 @@ m0_experiments <- function() {
     max_pts[[i]] <- tibble::tibble(C = c(out$d$C, max(out$d$n_encountered)),
                            label = c("c[min]", "n[min]"),
                            n_timesteps = paste("K =", out$d$n_timesteps, "surveys"),
-                           ypos = c(0.03, -0.02),
+                           ypos = c(0.05, -0.02),
                            xadj = c(-5, 4))
   }
 
@@ -137,14 +137,15 @@ fit_model <- function(df) {
   z_obs <- ifelse(apply(d$y_aug, 1, max) == 1, 1, NA)
   n_min <- max(c(d$C, d$n_encountered))
 
-  n_iter <- 300000
+  n_iter <- 400000
 
   #CMR
   system.time({
     m_par <- jagsUI::jags(data = m0_d,
                           model.file = here::here("analysis", "models", "m0.txt"),
                           n.chains = 6,
-                          n.adapt = n_iter / 2, n.iter = n_iter,
+                          n.adapt = n_iter / 2,
+                          n.iter = n_iter,
                           n.burnin = n_iter / 10,
                           n.thin = ifelse(n_iter > 1000, n_iter / 1000, 1),
                           parameters.to.save = c('z', 'p', 'N', 'omega'),

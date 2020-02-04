@@ -57,7 +57,7 @@ Similarly, total abundance must be greater than or equal to the number of unique
 Capture data differ however, in that information accumulates over multiple surveys [@pollock1982capture].
 For example, if two surveys occur on consecutive days in a closed population, then the total number of unique individuals captured across both surveys provides a lower bound on abundance. 
 
-Here, we show how visual encounter data can improve abundance estimates in capture-recapture studies for study designs where 1) individual identification requires capture (so that a subset of encountered individuals are captured), and 2) individuals can be encountered at most once per sampling occasion. 
+Here, we show how visual encounter data can improve abundance estimates in capture-recapture studies for study designs where 1) individual identification requires capture, 2) a subset of encountered individuals are captured, and 3) individuals can be encountered at most once per sampling occasion. 
 We develop a modified capture-recapture observation model, and investigate conditions under which encounter data improve abundance estimates.
 The methods presented here accommodate both failed captures and counts of animals collected separately from capture-recapture surveys, and can be integrated with existing capture-recapture models. 
 
@@ -188,7 +188,7 @@ This model can only estimate the marginal probability of capture $p = \eta \kapp
 The observation model is $y_{i, k} \sim \text{Bernoulli}(z_i p)$ for individuals $i=1, ..., M$ on survey $k=1, ..., K$. 
 The state model for $z$ is unchanged, and uniform priors over (0, 1) were assigned to $\omega$ and $p$. 
 
-Draws from the posterior distributions of all models were simulated using JAGS, with six parallel Markov chain Monte Carlo chains, and 300,000 iterations per chain with an adaptation period of 30,000, a burn-in period of 100,000, and posterior thinning by 300 to reduce memory usage [@plummer2003jags]. 
+Draws from the posterior distributions of all models were simulated using JAGS, with six parallel Markov chain Monte Carlo chains, and 400,000 iterations per chain with an adaptation period of 200,000, a burn-in period of 40,000, and posterior thinning by 400 to reduce memory usage [@plummer2003jags]. 
 Convergence was assessed using visual inspection of traceplots, and the potential scale reduction factor ($\hat{R}$) statistic [@gelman1992inference].
 All code to replicate the analyses is available in a research compendium at [https://github.com/mbjoseph/secmr](https://github.com/mbjoseph/secmr).
 
