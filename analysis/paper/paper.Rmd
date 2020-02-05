@@ -85,7 +85,7 @@ $$z_i \sim \text{Bernoulli}(\omega).$$
 On surveys $k=1,...,K$ an observer searches for individuals, encountering each individual with probability $\eta$.
 We assume individuals can only be encountered once at most.
 If an animal is encountered, it is captured with probability $\kappa$.
-Because individuals must be be captured to be identified, encounter data are observed for captured individuals, but not for failed captures. 
+Because individuals must be captured to be identified, encounter data are observed for captured individuals, but not for failed captures. 
 Thus, encounter histories are partly observed. 
 We assume the number of failed captures on each survey is observed. 
 
@@ -98,7 +98,7 @@ There are three possibilities (Figure 1):
 
 The first two outcomes are not observed. 
 We observe a binary record of whether individual $i$ was captured on survey $k$: $y_{i, k}$, so that $y_{i, k} = I(y^*_{i, k} = 3)$, where $I$ is an indicator function that is equal to one if the condition inside the parentheses is satisfied, otherwise it equals zero.
-In other words, $y^*_{i, k}$ is only observed if $y^*_{i, k} = 3$.
+In other words, $y^*_{i, k}$ is observed only if $y^*_{i, k} = 3$.
 Additionally, the observed number of failed captures $f_k$ corresponds to the sum $f_k = \sum_i I(y^*_{i, k} = 2)$.
 The observation model consists of two parts: one for the capture data: 
 
