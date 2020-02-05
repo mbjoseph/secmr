@@ -254,7 +254,7 @@ This work was motivated by years experience in the field capturing (and failing 
 
 ## Figure 1 {-}
 
-Conceptual diagram to represent the data model for individuals $i=1, ..., M$ and sampling occasions $k=1, ..., K$. Each individual is either in the population ($z_i=1$) or not ($z_i=0$). Those that are not are never encountered. Those that are may be encountered on occasion $k$ or not, and encountered individuals may or may not be captured and identified (we assume that identification requires capture, so that capture and identification are synonymous). Each path leads to a value of the partly observed quantity $y^*_{i, k}$, where $y^*_{i, k}=1$ when animals are not encountered, $y^*_{i, k}=2$ when animals are encountered but not identified, and $y^*_{i, k}=3$ when animals are encountered and identified.
+Conceptual diagram to represent the data model for individuals $i=1, ..., M$ and sampling occasions or surveys $k=1, ..., K$. Each individual is either in the population ($z_i=1$) or not ($z_i=0$). Those that are not are never encountered. Those that are may be encountered on occasion $k$ or not, and encountered individuals may or may not be captured and identified (we assume that identification requires capture, so that capture and identification are synonymous). Each path leads to a value of the partly observed quantity $y^*_{i, k}$, where $y^*_{i, k}=1$ when animals are not encountered, $y^*_{i, k}=2$ when animals are encountered but not identified, and $y^*_{i, k}=3$ when animals are encountered and identified.
 
 ## Figure 2 {-}
 
