@@ -3,7 +3,7 @@
 
 # secmr
 
-## A research compendium for: “Using encounter data to improve capture-recapture abundance estimates”
+## A research compendium for: “Using visual encounter data to improve capture-recapture abundance estimates”
 
 [![Travis build
 status](https://travis-ci.org/mbjoseph/secmr.svg?branch=master)](https://travis-ci.org/mbjoseph/secmr)
