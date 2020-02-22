@@ -14,9 +14,9 @@ status](https://travis-ci.org/mbjoseph/secmr.svg?branch=master)](https://travis-
 
 Our pre-print is online here:
 
-> Joseph MB, Knapp RA, (2020). *Using encounter data to improve
+> Joseph MB, Knapp RA, (2020). *Using visual encounter data to improve
 > capture-recapture abundance estimates*. bioRxiv, Online at
-> <https://doi.org/xxx/xxx>
+> <https://doi.org/10.1101/2020.01.22.915314>
 
 ### How to cite
 
