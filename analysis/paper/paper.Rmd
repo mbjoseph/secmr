@@ -21,6 +21,8 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+\linenumbers
+
 \begin{abstract}
 Capture-recapture studies are widely used in ecology to estimate population sizes and demographic rates. 
 In some capture-recapture studies, individuals may be visually encountered but not identified. 
@@ -32,8 +34,6 @@ Analytical results and simulations indicate that visual encounter data improve a
 We present a hierarchical Bayesian approach for integrating failed captures and auxiliary encounter data in statistical capture-recapture models. 
 This approach can be integrated with existing capture-recapture models, and may prove particularly useful for hard to capture species in data-limited settings.
 \end{abstract}
-
-\linenumbers
 
 ```{r, results='hide', message=FALSE, include=FALSE}
 # Run the main analysis
@@ -148,7 +148,7 @@ $$[a_k \mid \eta, z_1, ..., z_M] = \text{Binomial}(\eta, \sum_i z_i),$$
 for surveys $k=1, ..., K$.
 This is the observation model used in N-mixture models [@royle2004n]. 
 In addition to potentially providing a higher lower bound on abundance, auxiliary encounters also provide additional information about encounter probabilities, because the encounter data are conditionally independent from encounters leading to captures. 
-When combined with the capture-recapture model outlined above, the joint model of captures, failed captures, and auxiliary encounters comprise an integrated population model [@besbeas2002integrating; @abadi2010assessment]. 
+When combined with the capture-recapture model outlined above, the joint model of captures, failed captures, and auxiliary encounters comprise an integrated model [@besbeas2002integrating; @abadi2010assessment]. 
 The posterior distribution is proportional to: 
 
 $$
