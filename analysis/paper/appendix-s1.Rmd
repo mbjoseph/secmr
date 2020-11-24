@@ -1,0 +1,190 @@
+---
+title: "Appendix S1: Using visual encounter data to improve capture-recapture abundance estimates"
+subtitle: Ecosphere
+author:
+  - Maxwell B. Joseph^[Earth Lab, University of Colorado, Boulder, CO 80303, USA, maxwell.b.joseph@colorado.edu]
+  - Roland A. Knapp^[Sierra Nevada Aquatic Research Laboratory, University of California, Mammoth Lakes, CA 93546, USA]
+output:
+  bookdown::pdf_document2:
+    toc: false
+fontsize: 11pt
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This appendix includes model specifications and BUGS/JAGS code for failed capture and auxiliary encounter models. 
+These models differ in the observation process, but the model of presence/absence states is identical. 
+Each individual $i=1, ..., M$ is either in the population ($z_i=1$) or not ($z_i=0$), where $z_i \sim \text{Bernoulli}(\omega)$, and $\omega$ is an inclusion probability parameter. 
+Abundance is the sum of these values $N=\sum_i z_i$.
+
+## Baseline model {-}
+
+The baseline model is $M_0$ and assumes equal detection probabilities of individuals $i=1, ..., M$ on surveys $k=1,..., K$, where $y_{i, k}=1$ represents a capture of individual $i$ on survey $k$, and $y_{i, k}=0$ indicates no capture. 
+If $p$ is the capture probability, then $y_{i, k} \sim \text{Bernoulli}(z_i p)$.
+The posterior distribution is: 
+
+$$
+\begin{aligned}
+  \big[ z_1, ..., z_M, \omega, p \mid y_{1, 1}, ..., y_{M, K} \big] \propto \\
+  \overbrace{\prod_i \prod_k [y_{i, k} \mid z_{i}, p]}^{\text{Captures}} \times 
+  \times \overbrace{\prod_i [z_i \mid \omega]}^{\text{State model}} \times \overbrace{[\omega] [p]}^{\text{Priors}}.
+\end{aligned}
+$$
+
+JAGS code for this model with uniform priors over $\omega$ and $p$ is:
+
+```r
+model {
+omega ~ dbeta(1, 1)
+p ~ dbeta(1, 1)
+
+for (i in 1:M) {
+  z[i] ~ dbern(omega)
+  for (k in 1:K) {
+    y[i, k] ~ dbern(z[i] * p)
+  }
+}
+}
+```
+
+## Baseline model with failed captures {-}
+
+We add failed captures to the baseline model by introducing a categorical parameter $y^*_{i, k}$, which represents "not encountered" ($y^*_{i, k} = 1$), "failed capture" ($y^*_{i, k} = 2$), or "capture" ($y^*_{i, k}=3$). 
+If $\eta$ is the encounter probability, $\kappa$ is the probability of capture conditional on encounter, and $f_k$ is the number of failed captures, then as described in the main text the posterior is:
+
+$$
+\begin{aligned}
+  \big[ z_1, ..., z_M, y^*_{1, 1}, ..., y^*_{M, K}, \omega, \eta, \kappa \mid y_{1, 1}, ..., y_{M, K}, f_1, ..., f_K \big] \propto \\
+  \overbrace{\prod_i \prod_k [y_{i, k} \mid y^*_{i, k}]}^{\text{Captures}} \times \overbrace{\prod_k [f_k \mid y^*_{1, k}, ..., y^*_{M, k}]}^{\text{Failed captures}} \times \\
+  \overbrace{\prod_i \prod_k [y^*_{i, k} \mid z_i, \eta, \kappa]}^{\text{Encounter model}} \times \overbrace{\prod_i [z_i \mid \omega]}^{\text{State model}} \times \overbrace{[\omega] [\eta] [\kappa]}^{\text{Priors}}.
+\end{aligned}
+$$
+
+JAGS code for this model with uniform priors over $\omega$, $\eta$, and $\kappa$ is:
+
+```r
+model {
+  omega ~ dbeta(1, 1)
+  p_encounter ~ dbeta(1, 1)
+  p_capture ~ dbeta(1, 1)
+  p_encounter_and_capture = p_encounter * p_capture
+  p_failed_capture = p_encounter * (1 - p_capture)
+  p_not_encountered = 1 - p_encounter
+  
+  for (i in 1:M) {
+    z[i] ~ dbern(omega)
+    pi[i, 1] = z[i] * p_not_encountered + 1 - z[i]
+    pi[i, 2] = z[i] * p_failed_capture
+    pi[i, 3] = z[i] * p_encounter_and_capture
+    for (k in 1:K) {
+      y_star[i, k] ~ dcat(pi[i, ])
+      y[i, k] ~ dbern(y_star[i, k] == 3)
+    }
+  }
+  
+  # number of failed captures (soft constraint)
+  for (k in 1:K) {
+    failures[k] ~ dnorm(sum(y_star[, k] == 2), 4)
+  }
+}
+```
+
+Note that the normal distribution for failed captures imposes a "soft" constraint on the sum $\sum_i y^*_{i, k}$. 
+By adjusting the normal precision parameter, this constraint can be relaxed or made more strict. 
+In the strictest case a hard constraint can be imposed via the "ones trick", where a vector of ones is passed as data, and the likelihood for failed captures is represented as `ones[k] ~ dbern(sum(y_star[, k]) == failures[k])`.
+
+
+## Baseline model with auxiliary encounters {-}
+
+To add auxiliary encounter data to the baseline model, we use the following likelihood for the number of auxiliary encounters $a_k$ in survey $k$ conditional on the true abundance $N$ and the encounter probability $\eta$: 
+
+$$a_k \sim \text{Binomial}(\eta, N),$$
+
+where $N = \sum_i z_i$.
+Note that there need not be an equal number ($K$) capture-recapture surveys and auxiliary encounter surveys, but here we assume this is the case to simplify notation. 
+This model permits decomposing the parameter $p$, which represents the marginal probability of capture, into the product of the encounter probability $\eta$ and the probability of capture conditional on encounter $\kappa$. 
+
+Then, the posterior is:
+
+$$
+\begin{aligned}
+  \big[ z_1, ..., z_M, \omega, \eta, \kappa \mid y_{1, 1}, ..., y_{M, K}, a_1, ..., a_K \big] \propto \\
+  \overbrace{\prod_i \prod_k [y_{i, k} \mid z_{i}, \eta, \kappa]}^{\text{Captures}} \times \overbrace{\prod_k [a_k \mid \sum_i z_i, \eta]}^{\text{Auxiliary encounters}} \times 
+  \times \overbrace{\prod_i [z_i \mid \omega]}^{\text{State model}} \times \overbrace{[\omega] [\eta] [\kappa]}^{\text{Priors}}.
+\end{aligned}
+$$
+
+JAGS code for this model with uniform priors over $\omega$, $\eta$, and $\kappa$ is:
+
+```r
+model {
+omega ~ dbeta(1, 1)
+p_encounter ~ dbeta(1, 1)
+p_capture ~ dbeta(1, 1)
+
+for (i in 1:M) {
+  z[i] ~ dbern(omega)
+  for (k in 1:K) {
+    y[i, k] ~ dbern(z[i] * p_encounter * p_capture)
+  }
+}
+
+N <- sum(z[])
+for (k in 1:K) {
+  a[k] ~ dbinom(p_encounter, N)
+}
+}
+```
+
+## Baseline model with failed captures and auxiliary encounters {-}
+
+Combining failed captures and auxiliary encounters includes the N-mixture model likelihood for auxiliary encounters in the failed capture model. 
+As described in the main text, the posterior is: 
+
+
+$$
+\begin{aligned}
+  \big[ z_1, ..., z_M, y^*_{1, 1}, ..., y^*_{M, K}, \omega, \eta, \kappa \mid y_{1, 1}, ..., y_{M, K}, f_1, ..., f_K, a_1, ..., a_K \big] \propto \\
+  \overbrace{\prod_i \prod_k [y_{i, k} \mid y^*_{i, k}]}^{\text{Captures}} \times \overbrace{\prod_k [f_k \mid y^*_{1, k}, ..., y^*_{M, k}]}^{\text{Failed captures}} \times \overbrace{\prod_k [a_k \mid \sum_i z_i, \eta]}^{\text{Auxiliary encounters}} \times \\
+  \overbrace{\prod_i \prod_k [y^*_{i, k} \mid z_i, \eta, \kappa]}^{\text{Encounter model}} \times \overbrace{\prod_i [z_i \mid \omega]}^{\text{State model}} \times \overbrace{[\omega] [\eta] [\kappa]}^{\text{Priors}}.
+\end{aligned}
+$$
+
+JAGS code for this model with uniform priors over $\omega$, $\eta$, and $\kappa$ is:
+
+```r
+model {
+  omega ~ dbeta(1, 1)
+  p_encounter ~ dbeta(1, 1)
+  p_capture ~ dbeta(1, 1)
+  p_encounter_and_capture = p_encounter * p_capture
+  p_failed_capture = p_encounter * (1 - p_capture)
+  p_not_encountered = 1 - p_encounter
+  
+  for (i in 1:M) {
+    z[i] ~ dbern(omega)
+    pi[i, 1] = z[i] * p_not_encountered + 1 - z[i]
+    pi[i, 2] = z[i] * p_failed_capture
+    pi[i, 3] = z[i] * p_encounter_and_capture
+    for (k in 1:K) {
+      y_star[i, k] ~ dcat(pi[i, ])
+      y[i, k] ~ dbern(y_star[i, k] == 3)
+    }
+  }
+  
+  # number of failed captures (soft constraint)
+  for (k in 1:K) {
+    failures[k] ~ dnorm(sum(y_star[, k] == 2), 4)
+  }
+  
+  N <- sum(z[])
+  for (k in 1:K) {
+    a[k] ~ dbinom(p_encounter, N)
+  }
+}
+```
