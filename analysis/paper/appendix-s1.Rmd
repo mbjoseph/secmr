@@ -31,8 +31,7 @@ The posterior distribution is:
 $$
 \begin{aligned}
   \big[ z_1, ..., z_M, \omega, p \mid y_{1, 1}, ..., y_{M, K} \big] \propto \\
-  \overbrace{\prod_i \prod_k [y_{i, k} \mid z_{i}, p]}^{\text{Captures}} \times 
-  \times \overbrace{\prod_i [z_i \mid \omega]}^{\text{State model}} \times \overbrace{[\omega] [p]}^{\text{Priors}}.
+  \overbrace{\prod_i \prod_k [y_{i, k} \mid z_{i}, p]}^{\text{Captures}} \times \overbrace{\prod_i [z_i \mid \omega]}^{\text{State model}} \times \overbrace{[\omega] [p]}^{\text{Priors}}.
 \end{aligned}
 $$
 
@@ -114,7 +113,7 @@ Then, the posterior is:
 $$
 \begin{aligned}
   \big[ z_1, ..., z_M, \omega, \eta, \kappa \mid y_{1, 1}, ..., y_{M, K}, a_1, ..., a_K \big] \propto \\
-  \overbrace{\prod_i \prod_k [y_{i, k} \mid z_{i}, \eta, \kappa]}^{\text{Captures}} \times \overbrace{\prod_k [a_k \mid \sum_i z_i, \eta]}^{\text{Auxiliary encounters}} \times 
+  \overbrace{\prod_i \prod_k [y_{i, k} \mid z_{i}, \eta, \kappa]}^{\text{Captures}} \times \overbrace{\prod_k [a_k \mid \sum_i z_i, \eta]}^{\text{Auxiliary encounters}}
   \times \overbrace{\prod_i [z_i \mid \omega]}^{\text{State model}} \times \overbrace{[\omega] [\eta] [\kappa]}^{\text{Priors}}.
 \end{aligned}
 $$
